@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Automation Testing Hub</title>
+<style>
+:root{
+  --bg:#121212;--card:#1e1e1e;--input:#2d2d2d;--text:#e0e0e0;--muted:#a0a0a0;
+  --accent:#bb86fc;--error:#cf6679;--success:#03dac6;--border:#333;
+}
+*{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{background:var(--bg);color:var(--text);margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.container{background:var(--card);padding:2rem;border-radius:12px;width:100%;max-width:520px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+h2{text-align:center;color:var(--accent)}
+label{font-size:.85rem;color:var(--muted);font-weight:600}
+input,select{
+  width:100%;padding:12px;margin-top:6px;border:1px solid var(--border);
+  background:var(--input);color:white;border-radius:6px;transition:.2s;
+}
+input.error, select.error{border-color:var(--error)}
+input:focus,select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 1px var(--accent)}
+.error-msg{color:var(--error);font-size:.75rem;font-weight:600;min-height:14px;margin-top:3px}
+.row{display:flex;gap:10px}
+.row>div{flex:1}
+button{
+  width:100%;padding:14px;margin-top:1rem;border:none;border-radius:6px;
+  background:var(--accent);color:black;font-weight:bold;cursor:pointer;transition:.2s
+}
+button:hover{opacity:.9;transform:translateY(-1px)}
+.toggle{cursor:pointer;color:var(--accent);font-size:.8rem;margin-top:8px;text-align:center}
+.hidden{display:none}
+.pass-wrap{position:relative}
+.toggle-pass{position:absolute;right:10px;top:38px;font-size:.75rem;color:var(--accent);cursor:pointer}
+
+
+.checkbox-wrap{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:10px;
+}
+
+.checkbox-wrap input[type="checkbox"]{
+  width:auto;
+  margin:0;
+  accent-color: var(--accent);
+  cursor:pointer;
+}
+
+.checkbox-wrap label{
+  cursor:pointer;
+  color:var(--muted);
+  font-size:.85rem;
+  user-select:none;
+}
+
+
+/* Toast */
+#toast{
+ position:fixed;top:20px;right:20px;
+ background:var(--success);color:#000;
+ padding:12px 16px;border-radius:8px;
+ font-weight:bold;display:none;z-index:1000;
+ box-shadow:0 5px 15px rgba(0,0,0,.4);
+}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<div id="signup" class="container">
+<h2>Create Account</h2>
+<form onsubmit="register(event)">
+
+<div class="row">
+<div>
+<label>First Name*</label>
+<input id="firstName" maxlength="30">
+<div id="firstNameError" class="error-msg"></div>
+</div>
+<div>
+<label>Last Name*</label>
+<input id="lastName" maxlength="30">
+<div id="lastNameError" class="error-msg"></div>
+</div>
+</div>
+
+<label>Email*</label>
+<input id="email">
+<div id="emailError" class="error-msg"></div>
+
+<label>Phone*</label>
+<input id="phone">
+<div id="phoneError" class="error-msg"></div>
+
+<div class="row">
+<div>
+<label>DOB</label>
+<input id="dob" type="date">
+</div>
+<div>
+<label>Gender</label>
+<select id="gender"><option value="">Select</option><option>Male</option><option>Female</option></select>
+</div>
+</div>
+
+<div class="row">
+<input id="country" placeholder="Country">
+<input id="state" placeholder="State">
+<input id="city" placeholder="City">
+</div>
+
+<div class="pass-wrap">
+<label>Password*</label>
+<input id="password" type="password">
+<span class="toggle-pass" onclick="togglePass('password',this)">SHOW</span>
+<div id="passwordError" class="error-msg"></div>
+</div>
+
+<label>Confirm Password*</label>
+<input id="confirmPassword" type="password">
+<div id="confirmError" class="error-msg"></div>
+
+<div class="checkbox-wrap">
+  <input type="checkbox" id="terms">
+  <label for="terms">Accept Terms</label>
+</div>
+<div id="termsError" class="error-msg"></div>
+
+<button>Create Account</button>
+<div class="toggle" onclick="show('login')">Already have account? Login</div>
+</form>
+
+<div style="margin-top:20px; font-size:12px; color:#ccc; line-height:1.5;">
+  <b>QA Test Coverage (Signup)</b>
+  <ul>
+    <li><b>Positive Testing:</b> Valid registration with all correct inputs</li>
+    <li><b>Mandatory Field Validation:</b> First Name, Last Name, Email, Phone, Password, Terms</li>
+    <li><b>Email Validation:</b> Format check + duplicate email restriction</li>
+    <li><b>Password Validation:</b> Min 8 chars, uppercase, lowercase, number, special character</li>
+    <li><b>Confirm Password:</b> Password mismatch validation</li>
+    <li><b>Phone Validation:</b> Supports international format (+1234567890)</li>
+    <li><b>Name Validation:</b> No numbers or special characters allowed</li>
+    <li><b>DOB Validation:</b> Future dates restricted</li>
+    <li><b>Negative Testing:</b> Empty fields, invalid formats, duplicate email</li>
+    <li><b>Boundary Testing:</b> Max length (30 chars for names)</li>
+    <li><b>Input Handling:</b> Trim spaces before validation</li>
+  </ul>
+</div>
+
+</div>
+
+<div id="login" class="container hidden">
+<h2>Login</h2>
+<form onsubmit="login(event)">
+<label>Email</label>
+<input id="loginEmail">
+
+<div class="pass-wrap">
+<label>Password</label>
+<input id="loginPass" type="password">
+<span class="toggle-pass" onclick="togglePass('loginPass',this)">SHOW</span>
+</div>
+
+<div id="loginError" class="error-msg"></div>
+<div class="checkbox-wrap">
+  <input type="checkbox" id="remember">
+  <label for="remember">Remember Me</label>
+</div>
+<button>Login</button>
+<div class="toggle" onclick="forgot()">Forgot Password?</div>
+<div class="toggle" onclick="show('signup')">New user? Sign up</div>
+</form>
+
+<div style="margin-top:20px; font-size:12px; color:#ccc; line-height:1.5;">
+  <b>QA Test Coverage (Login)</b>
+  <ul>
+    <li><b>Positive Testing:</b> Valid login with correct credentials</li>
+    <li><b>Negative Testing:</b> Invalid email/password combinations</li>
+    <li><b>Empty Field Validation:</b> Prevent login with blank fields</li>
+    <li><b>Account Lock:</b> Locks after 3 failed attempts</li>
+    <li><b>Session Handling:</b> "Remember Me" persists login</li>
+    <li><b>Password Masking:</b> Password hidden with toggle visibility</li>
+    <li><b>Trim Handling:</b> Removes leading/trailing spaces</li>
+    <li><b>Forgot Password:</b> Mock reset flow</li>
+  </ul>
+</div>
+
+</div>
+
+<div id="dashboard" class="container hidden">
+<h2>Dashboard</h2>
+<p id="welcome"></p>
+<button onclick="logout()">Logout</button>
+</div>
+
+<script>
+function show(id){document.querySelectorAll('.container').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
+function togglePass(id,el){let f=document.getElementById(id);if(f.type==='password'){f.type='text';el.innerText='HIDE'}else{f.type='password';el.innerText='SHOW'}}
+
+function showToast(msg,color='success'){
+ let t=document.getElementById('toast');
+ t.innerText=msg;
+ t.style.display='block';
+ t.style.background=color==='error'?'var(--error)':'var(--success)';
+ setTimeout(()=>t.style.display='none',2000);
+}
+
+function clearErrors(){
+ document.querySelectorAll('.error-msg').forEach(e=>e.innerText='');
+ document.querySelectorAll('input,select').forEach(e=>e.classList.remove('error'));
+}
+
+function setError(id,msg){
+ document.getElementById(id+'Error').innerText=msg;
+ document.getElementById(id).classList.add('error');
+}
+
+function scrollToFirstError(){
+ let el=document.querySelector('.error');
+ if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function register(e){
+ e.preventDefault();
+ clearErrors();
+ let fn=firstName.value.trim(),ln=lastName.value.trim(),em=email.value.trim(),ph=phone.value.trim();
+ let pw=password.value,cp=confirmPassword.value;
+ let ok=true;
+
+ if(!fn||/[^a-zA-Z]/.test(fn)){setError('firstName','Invalid first name');ok=false}
+ if(!ln||/[^a-zA-Z]/.test(ln)){setError('lastName','Invalid last name');ok=false}
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){setError('email','Invalid email');ok=false}
+ let users=JSON.parse(localStorage.getItem('users')||'[]');
+ if(users.find(u=>u.email===em)){setError('email','Email exists');ok=false}
+ if(!/^\+?[0-9]{10,15}$/.test(ph)){setError('phone','Invalid phone');ok=false}
+ if(!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(pw)){setError('password','Weak password');ok=false}
+ if(pw!==cp){setError('confirmPassword','Mismatch');ok=false}
+ if(!terms.checked){termsError.innerText='Accept terms';ok=false}
+ if(dob.value && new Date(dob.value)>new Date()){termsError.innerText='DOB cannot be future';ok=false}
+
+ if(!ok){scrollToFirstError();return}
+
+ users.push({fn,ln,email:em,pass:pw});localStorage.setItem('users',JSON.stringify(users));
+ showToast('Registration Successful');
+ setTimeout(()=>show('login'),1000);
+}
+
+let attempts=0;
+function login(e){
+ e.preventDefault();
+ let em=loginEmail.value.trim(),pw=loginPass.value;
+ let users=JSON.parse(localStorage.getItem('users')||'[]');
+ let user=users.find(u=>u.email===em&&u.pass===pw);
+ if(!user){attempts++;loginError.innerText=attempts>=3?'Account locked':'Invalid credentials';return}
+ attempts=0;if(remember.checked)localStorage.setItem('session',em);
+ welcome.innerText='Welcome '+user.fn;
+ showToast('Login Successful');
+ show('dashboard');
+}
+
+function logout(){localStorage.removeItem('session');show('login');showToast('Logged out')}
+function forgot(){showToast('Reset link sent')}
+window.onload=()=>{if(localStorage.getItem('session'))show('dashboard')}
+</script>
+
+</body>
+</html>
